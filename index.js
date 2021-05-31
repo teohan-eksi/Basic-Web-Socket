@@ -2,10 +2,28 @@
 
 
 const http = require("http");
-const webSocketServer = require("websocket").server;
+const WebSocketServer = require("websocket").server;
+
+let connection = null;
 
 const httpServer = http.createServer((request, response) =>{
   console.log("request received.")
+});
+
+const webSocket = new WebSocketServer({
+  "httpServer": httpServer
+});
+
+webSocket.on("request", request=>{
+  connection = request.accept(null, request.origin);
+
+  connection.on("onopen", () => {
+    console.log("web socket connection opened.");
+  });
+
+  connection.on("onmessage", message => {
+    console.log('message: ${message}');
+  });
 });
 
 httpServer.listen(8080, ()=>{
